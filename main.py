@@ -35,7 +35,7 @@ def updateViento():
     scrap_MuchoViento()
 
 
-@app.get('/')
+@app.get('/api')
 def api():
     with open('./apiActualWind.json', 'r') as infile:
         apiVientoActual= json.load(infile)

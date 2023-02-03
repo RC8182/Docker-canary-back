@@ -1,14 +1,20 @@
 from selenium import webdriver
+import os
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import json
-from datetime import datetime
+
 
 #Viento Tablas en El Medano
 def scrap_MuchoViento():
     time.sleep(1)
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
     driver.get("https://muchoviento.net/El%20M%C3%A9dano%20-%20Playa%20Sur/forecast72")
 
     time.sleep(2)
@@ -79,14 +85,7 @@ def scrap_MuchoViento():
                 fuerza.append(lista[i])
         return fuerza
 
-
-    # def fecha():
-    #     hoy= datetime.strftime("%A")
-    #     diasSemana=('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')
-    #     meses= ('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre')
-    #     return f'{diasSemana[5]}, {hoy}. {meses[1]}'
-    # x= fecha()
-    # print(x)
+ 
 
     dia1= get_lista(tabla_dia_1)
     temp_D1= limpiarLista(tabla_temp_dia1, 2)
