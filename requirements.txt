@@ -1,7 +1,4 @@
 fastapi
-uvicorn
-json
-time
-json 
+uvicorns 
 os
 selenium
