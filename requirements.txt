@@ -1,5 +1,0 @@
-python
-fastapi
-uvicorns 
-os
-selenium
