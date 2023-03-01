@@ -5,8 +5,9 @@ import time
 import json
 import os
 
-
-
+# Creamos la variable de entorno para Docker
+URL1= os.getenv('VIENTO_ACTUAL1')
+URL2= os.getenv('VIENTO_ACTUAL2')
 
     # Creamos una función para iterar sobre la info pedida y almazenarla en una lista
 def get_lista(list):
@@ -20,35 +21,43 @@ def dataObject(viento, direction, grados):
     return obj_Data
 
 
-def scrap_Data_windguru():
-    
+def get_scrapt(url, path):
     chrome_options = webdriver.ChromeOptions()
     chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-    driver.get("https://www.windguru.cz/station/3209")
-
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), chrome_options=chrome_options)
+    driver.get(url)
     time.sleep(2)
+    scrapt= driver.find_elements('xpath',path)
 
-    vientoActual = driver.find_elements('xpath','//*[@id="spot-data"]/div[3]/a/span[1]')
-    direccionVientoActual= driver.find_elements('xpath','//*[@id="spot-data"]/div[2]/span[1]/span')
-    gradosVientoActual= driver.find_elements('xpath','//*[@id="spot-data"]/div[2]/span[2]/span')
-        
-    
+    return scrapt
+
+
+def scrap_Data_viento_actual():
+
+    direccionVientoActual= get_scrapt(URL1,'//*[@id="spot-data"]/div[2]/span[1]/span')
+    gradosVientoActual= get_scrapt(URL1,'//*[@id="spot-data"]/div[2]/span[2]/span')
+
+    vientoActual = get_scrapt(URL2,'/html/body/header/v[1]/span')
+
+            
     vientoList= get_lista(vientoActual)
     directionList= get_lista(direccionVientoActual)
     gradosList= get_lista(gradosVientoActual)
     gradosList= list(map(lambda str: str.replace('°', ''), gradosList))  
     apiActualWind= dataObject(vientoList, directionList, gradosList)
 
-    with open('apiActualWind.json', 'w') as api:
-        json.dump(apiActualWind, api)
+    
+    
+    with open('data/apiActualWind.json', 'w') as api_Actual_Wind:
+        try:
+            json.dump(apiActualWind, api_Actual_Wind)
+        except:
+            print('No hemos podido escribir el archivo')    
 
-    driver.quit()
-
-    return api
+    return api_Actual_Wind
 
 
  

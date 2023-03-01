@@ -4,20 +4,27 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import json
+# Creamos la variable de entorno para Docker
+entorno= os.getenv('PRONOSTICO_VIENTO')
 
+def get_driver():
+    time.sleep(3)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--headless")
+    driver =  webdriver.Chrome(service=Service(ChromeDriverManager().install()), executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    return driver
 
 #Viento Tablas en El Medano
-def scrap_MuchoViento():
-    time.sleep(1)
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-    driver.get("https://muchoviento.net/El%20M%C3%A9dano%20-%20Playa%20Sur/forecast72")
+def scrap_pronostico_viento():
 
-    time.sleep(2)
+    URL = entorno
+    driver = get_driver()
+    driver.get(URL)
+    driver.implicitly_wait(5)
+
+    time.sleep(2)    
+
 
     tabla_Horas = driver.find_elements('xpath','//*[@id="tabelle"]/table[1]/tbody/tr[2]')
 
@@ -136,7 +143,7 @@ def scrap_MuchoViento():
     dataApi=[data1, data2, data3]
     
     ##################### Guardamos la data en un archivo JSON #######################
-    with open('apiWind.json', 'w') as apiWind:
+    with open('data/apiWind.json', 'w') as apiWind:
         json.dump(dataApi, apiWind)
 
     driver.quit()
