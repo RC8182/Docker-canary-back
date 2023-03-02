@@ -1,8 +1,9 @@
 import requests
 import json
+import os
 
 def get_mareas():
-    url = 'https://ideihm.covam.es/api-ihm/getmarea?request=gettide&id=64&format=json&month=202303'
+    url = os.getenv('MAREAS_DATA')
     headers = {'Accept': 'application/json',
                'Content-Type':'application/json'
                }

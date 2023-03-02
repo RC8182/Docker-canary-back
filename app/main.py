@@ -71,5 +71,5 @@ def apiMareas():
     return apiMareas
 
 if __name__=='__main__':
-    uvicorn.run('main:app', port=800, reload= True)
+    uvicorn.run('main:app', port=8001, reload= True)
 
