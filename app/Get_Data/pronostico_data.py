@@ -5,20 +5,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import json
 # Creamos la variable de entorno para Docker
-entorno= os.getenv('PRONOSTICO_VIENTO')
+URL= os.getenv('PRONOSTICO_VIENTO')
 
 def get_driver():
     time.sleep(3)
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--headless")
-    driver =  webdriver.Chrome(service=Service(ChromeDriverManager().install()), executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    driver =  webdriver.Chrome(service=Service(ChromeDriverManager().install()), chrome_options=chrome_options)
     return driver
 
 #Viento Tablas en El Medano
 def scrap_pronostico_viento():
 
-    URL = entorno
     driver = get_driver()
     driver.get(URL)
     driver.implicitly_wait(5)

@@ -6,6 +6,7 @@ from fastapi_utils.tasks import repeat_every
 from Get_Data.viento_actual_data import *
 from Get_Data.pronostico_data import *
 from Get_Data.mareas_data import *
+from Get_Data.sol_data import *
 
 
 
@@ -35,11 +36,9 @@ def updateVientoActual():
 @repeat_every(seconds=60*60)
 def updateViento():
     scrap_pronostico_viento()
-
-@app.on_event("startup")
-@repeat_every(seconds=60*60)
-def updateMareas():
-    get_mareas()    
+    get_sun_state()
+    get_mareas() 
+ 
 
 time.sleep(5)
 
@@ -59,7 +58,13 @@ def apiVientos():
         except:    
             print('Error archivo no encontrado....')
 
-    return [apiVientoActual, apiViento]
+    with open('data/apiSun.json', 'r') as infile:
+        try:
+            apiSol= json.load(infile) 
+        except:    
+            print('Error archivo no encontrado....')
+
+    return [ apiVientoActual, apiViento, apiSol]
 
 @app.get('/mareas')
 def apiMareas():
@@ -71,5 +76,5 @@ def apiMareas():
     return apiMareas
 
 if __name__=='__main__':
-    uvicorn.run('main:app', port=8001, reload= True)
+    uvicorn.run('main:app', port=8000, reload= True)
 
