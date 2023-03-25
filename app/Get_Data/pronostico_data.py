@@ -1,32 +1,63 @@
-from selenium import webdriver
+from functions.funciones import get_driver, get_lista, translate_date
+from selenium.webdriver.support.ui import Select
 import os
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-import time
 import json
+import time
 # Creamos la variable de entorno para Docker
 URL= os.getenv('PRONOSTICO_VIENTO')
 
-def get_driver():
-    time.sleep(3)
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--headless")
-    driver =  webdriver.Chrome(service=Service(ChromeDriverManager().install()), chrome_options=chrome_options)
-    return driver
+# Creamos la función para crear los objetos de nuestra API
+def data(fecha, hora, temp, viento,fuerza, racha, direction):
+    obj_Data={'fecha':fecha, 'hora': hora, 'temperatura':temp, 'viento':viento, 'fuerza':fuerza, 'racha':racha, 'direccion':direction}
+    return obj_Data
+
+################### Creamos una función para limpiar los datos  ########################
+
+
+def limpiarLista(lista, n):
+    lista= get_lista(lista)
+    listaLimpia= lista[0].split()
+    for i in range(n):
+        listaLimpia.pop(0)
+    return listaLimpia
+
+# La lista viento llega con 2 valores, los indices pares son el viento y los impares la fuerza, creamos una función para separar Viento de Fuerza
+def filtrarViento(lista):
+    viento=[]
+    for i in range(len(lista)):
+        if (int(i) % 2 == 0):
+            viento.append(lista[i])
+    return viento
+
+
+def filtrarFuerza(lista):
+    fuerza=[]
+    for i in range(len(lista)):
+        if (int(i) % 2 != 0):
+            fuerza.append(lista[i])
+    return fuerza
 
 #Viento Tablas en El Medano
-def scrap_pronostico_viento():
+def get_pronostico_viento():
+    print('Pedimos driver')
+    driver = get_driver(URL)   
+    ### Accedemos a muchoviento.net y navegamos hacia Spain - Teneriffa - El medano
+    time.sleep(3)
+    print('Formulario estadio 0')
+    formulario= Select(driver.find_element_by_xpath("/html/body/div[3]/form/div[1]/select[@name='country']"))
+    formulario.select_by_visible_text("Spain / Canaries")
+    time.sleep(3)
+    # formulario1= Select(driver.select_by_value('value="Teneriffa"'))
+    # formulario1.select_by_visible_text("Teneriffa")
+    # time.sleep(3)
+    # formulario2= Select(driver.select_by_value('value="El Cabezo"'))
+    # formulario2.select_by_visible_text("El Cabezo").click()
+    # time.sleep(2)
 
-    driver = get_driver()
-    driver.get(URL)
-    driver.implicitly_wait(5)
-
-    time.sleep(2)    
-
-
+    ### Guardamos las tablas de los elementos horas.
+    
     tabla_Horas = driver.find_elements('xpath','//*[@id="tabelle"]/table[1]/tbody/tr[2]')
-
+    print('Formulario estadio 1')
     ###   Día 1   ###
 
     tabla_dia_1= driver.find_elements('xpath', '//*[@id="tabelle"]/table[1]/tbody/tr[1]/th[2]')
@@ -49,51 +80,14 @@ def scrap_pronostico_viento():
     tabla_direccion_viento_dia3= driver.find_elements('xpath','//*[@id="tabelle"]/table[1]/tbody/tr[19]')
     tabla_racha_dia3 = driver.find_elements('xpath','//*[@id="tabelle"]/table[1]/tbody/tr[18]')
     tabla_temp_dia3 = driver.find_elements('xpath','//*[@id="tabelle"]/table[1]/tbody/tr[20]')
-
-
     
 
-    # Creamos una función para iterar sobre la info pedida y almazenarla en una lista
-    def get_lista(list):
-        lista=[]
-        for i in range(len(list)):
-            lista.append(list[i].text)  
-        return lista        
 
-    # Creamos la función para crear los objetos de nuestra API
-    def data(fecha, hora, temp, viento,fuerza, racha, direction):
-        obj_Data={'fecha':fecha, 'hora': hora, 'temperatura':temp, 'viento':viento, 'fuerza':fuerza, 'racha':racha, 'direccion':direction}
-        return obj_Data
-
-    ################### Creamos una función para limpiar los datos  ########################
-
-    
-    def limpiarLista(lista, n):
-        lista= get_lista(lista)
-        listaLimpia= lista[0].split()
-        for i in range(n):
-            listaLimpia.pop(0)
-        return listaLimpia
-
-    # La lista viento llega con 2 valores, los indices pares son el viento y los impares la fuerza, creamos una función para separar Viento de Fuerza
-    def filtrarViento(lista):
-        viento=[]
-        for i in range(len(lista)):
-            if (int(i) % 2 == 0):
-                viento.append(lista[i])
-        return viento
-
-    
-    def filtrarFuerza(lista):
-        fuerza=[]
-        for i in range(len(lista)):
-            if (int(i) % 2 != 0):
-                fuerza.append(lista[i])
-        return fuerza
 
  
 
-    dia1= get_lista(tabla_dia_1)
+    dia1_Ingles= get_lista(tabla_dia_1)
+    dia1= translate_date(dia1_Ingles)
     temp_D1= limpiarLista(tabla_temp_dia1, 2)
     viento_fuerza_D1= limpiarLista(tabla_viento_dia1, 2)
     viento_D1= filtrarViento(viento_fuerza_D1)
@@ -115,7 +109,8 @@ def scrap_pronostico_viento():
     # hora_dia3.replace("h", " ")
     # print(hora_dia1)
 
-    dia2= get_lista(tabla_dia_2)
+    dia2_Ingles= get_lista(tabla_dia_2)
+    dia2= translate_date(dia2_Ingles)
     temp_D2= limpiarLista(tabla_temp_dia2, 2)
     viento_fuerza_D2= limpiarLista(tabla_viento_dia2, 2)
     viento_D2= filtrarViento(viento_fuerza_D2)
@@ -123,7 +118,8 @@ def scrap_pronostico_viento():
     dir_Viento_D2= limpiarLista(tabla_direccion_viento_dia2, 2)
     gusts_D2= limpiarLista(tabla_racha_dia2, 1)
 
-    dia3= get_lista(tabla_dia_3)
+    dia3_Ingles= get_lista(tabla_dia_3)
+    dia3= translate_date(dia3_Ingles)
     temp_D3= limpiarLista(tabla_temp_dia3, 2)
     viento_fuerza_D3= limpiarLista(tabla_viento_dia3, 2)
     viento_D3= filtrarViento(viento_fuerza_D3)
@@ -143,9 +139,12 @@ def scrap_pronostico_viento():
     
     ##################### Guardamos la data en un archivo JSON #######################
     with open('data/apiWind.json', 'w') as apiWind:
-        json.dump(dataApi, apiWind)
+        try:
+            json.dump(dataApi, apiWind)
+        except:
+            print('No hemos podido escribir el archivo')   
 
     driver.quit()
-    return dataApi
+    return apiWind
 
 

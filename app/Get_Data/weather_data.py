@@ -2,20 +2,20 @@ import requests
 import json
 import os
 
-def get_mareas():
-    URL = os.getenv('MAREAS_DATA')
+def get_weather():
+    URL = os.getenv('WEATHER_DATA')
     headers = {'Accept': 'application/json',
                'Content-Type':'application/json'
                }
     response = requests.request('GET',URL, headers=headers, data={})
     
-    apiMareas= response.json()
+    apiWeather= response.json()
 
-    with open('data/apiMareas.json', 'w') as api_mareas:
+    with open('data/apiWeather.json', 'w') as api_weather:
         try:
-            json.dump(apiMareas, api_mareas)
+            json.dump(apiWeather, api_weather)
         except:
             print('No se ha podido escribir')    
 
     
-    return api_mareas
+    return api_weather
