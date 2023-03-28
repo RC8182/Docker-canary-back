@@ -1,21 +1,26 @@
 import requests
 import json
+from datetime import datetime
 import os
 
 def get_weather():
+    updated= str(datetime.now())
     URL = os.getenv('WEATHER_DATA')
     headers = {'Accept': 'application/json',
                'Content-Type':'application/json'
                }
     response = requests.request('GET',URL, headers=headers, data={})
     
-    apiWeather= response.json()
+    apiWeather= [{'last_update': updated},response.json()]
+    try:
+        with open('data/apiWeather.json', 'w') as file:
+            print('Escribiendo apiWeather...')
+            try:
+                json.dump(apiWeather, file)
+            except:
+                print('No se ha podido escribir') 
 
-    with open('data/apiWeather.json', 'w') as api_weather:
-        try:
-            json.dump(apiWeather, api_weather)
-        except:
-            print('No se ha podido escribir')    
-
-    
-    return api_weather
+    except:
+        print('Error apiWeather...')    
+   
+    return file

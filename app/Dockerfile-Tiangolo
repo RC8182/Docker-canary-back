@@ -1,4 +1,4 @@
-FROM tiangolo/meinheld-gunicorn
+FROM tiangolo/uvicorn-gunicorn:python3.11-slim
 
 # Instalamos Chrome y CromeDriver en el contenedor
 RUN apt-get update && \

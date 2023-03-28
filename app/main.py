@@ -13,6 +13,9 @@ PORT= os.getenv('PUERTO')
 
 
 app= FastAPI()
+
+
+
 #----------------------- Midleware -----------------------#
 from fastapi.middleware.cors import CORSMiddleware
 origins = [
@@ -30,24 +33,20 @@ app.add_middleware(
 
 @app.on_event("startup")
 @repeat_every(seconds=60 * 10)  
-def updateVientoActual():
+async def updateVientoActual():
     print(time.localtime())
     get_Data_viento_actual()
-    get_weather()
-    
 
 @app.on_event("startup")
-@repeat_every(seconds=60*60)
-def updateViento():
+@repeat_every(seconds=60*1)
+async def updateViento():
     print(time.localtime())
+    get_weather()
     get_sun_state()
     get_mareas() 
- 
-
-time.sleep(5)
 
 @app.get('/A28P645I455@api')
-def apiMeteo():
+async def apiMeteo():
 
     with open('data/apiActualWind.json', 'r') as infile:
         try:
@@ -72,7 +71,7 @@ def apiMeteo():
     return [apiVientoActual, apiWeather, apiSol]
 
 @app.get('/A28P645I455@api/mareas')
-def apiMareas():
+async def apiMareas():
     with open('data/apiMareas.json', 'r') as infile:
         try:
             apiMareas= json.load(infile) 

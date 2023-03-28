@@ -1,9 +1,10 @@
 from astral import LocationInfo
 from astral.sun import sun
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import json
 
 def get_sun_state():
+    updated= str(datetime.now())
     dia0= date.today()
     dia1= date.today() + timedelta(1)
     dia2= date.today() + timedelta(2)
@@ -12,6 +13,7 @@ def get_sun_state():
     ciudad = LocationInfo("El Médano", "Spain", "Europe/Canary Island", 28.04510028059856, -16.536500855913307)
     listaFechas=[]
     listaStatus=[]
+    print(updated)
     for i in dias:
         s = sun(ciudad.observer, i)
         fecha=str(i)
@@ -26,15 +28,18 @@ def get_sun_state():
         listaStatus.append(estado)
 
     api_sun={
+        'last_update': updated,
         'fecha': listaFechas,
-        'status': listaStatus
+        'status': listaStatus,
     }   
+
         
-    with open('data/apiSun.json', 'w') as escribir:
+    with open('data/apiSun.json', 'w') as file:
+        print('Escribiendo apiSun...')
         try:
-            json.dump(api_sun, escribir)
+            json.dump(api_sun, file)
         except:
             print('No se ha podido escribir')           
 
-    return 
+    return file
 

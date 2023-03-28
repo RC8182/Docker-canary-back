@@ -28,19 +28,18 @@ def get_Data_viento_actual():
     gradosList= get_lista(gradosVientoActual)
     gradosList= list(map(lambda str: str.replace('°', ''), gradosList))  
     apiActualWind= dataObject(vientoList, directionList, gradosList)
-
-    print('Ejecutando: get_Data_viento_actual()')
     
-    with open('data/apiActualWind.json', 'w') as api_Actual_Wind:
+    with open('data/apiActualWind.json', 'w') as file:
+        print('Escribiendo apiActualWind...')
         try:
-            json.dump(apiActualWind, api_Actual_Wind)
+            json.dump(apiActualWind, file)
         except:
             print('No hemos podido escribir el archivo')   
              
     time.sleep(2)
     driver1.quit()
     driver2.quit()
-    return api_Actual_Wind
+    return 
 
 
  

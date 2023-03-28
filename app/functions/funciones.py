@@ -11,7 +11,6 @@ def get_driver(url):
     chrome_options.add_argument("--disable-gpu") 
     time.sleep(1)
     driver =  webdriver.Chrome(service=Service(ChromeDriverManager().install()), chrome_options=chrome_options)
-    print('Obtenemos url en driver')
     driver.get(url)
     time.sleep(5)
     return driver
