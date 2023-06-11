@@ -41,5 +41,5 @@ def get_sun_state():
         except:
             print('No se ha podido escribir')           
 
-    return file
+    return 
 

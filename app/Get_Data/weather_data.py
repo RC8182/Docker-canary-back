@@ -1,26 +1,26 @@
-import requests
+import aiohttp
 import json
 from datetime import datetime
 import os
 
-def get_weather():
+async def get_weather():
     updated= str(datetime.now())
     URL = os.getenv('WEATHER_DATA')
     headers = {'Accept': 'application/json',
                'Content-Type':'application/json'
                }
-    response = requests.request('GET',URL, headers=headers, data={})
-    
-    apiWeather= [{'last_update': updated},response.json()]
+    async with aiohttp.ClientSession() as session: 
+        async with session.get(URL, headers=headers, data={}) as response: 
+            
+            apiWeather= [{'last_update': updated}, await response.json()]
     try:
+
         with open('data/apiWeather.json', 'w') as file:
-            print('Escribiendo apiWeather...')
+
             try:
                 json.dump(apiWeather, file)
             except:
-                print('No se ha podido escribir') 
-
+                print('No se ha podido escribir apiweather') 
     except:
-        print('Error apiWeather...')    
-   
+        print('Error with Weather Data')
     return file

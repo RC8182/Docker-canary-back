@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
 import json
-import time
 import os
 from fastapi_utils.tasks import repeat_every
 from Get_Data.viento_actual_data import get_Data_viento_actual
@@ -9,7 +8,7 @@ from Get_Data.weather_data import get_weather
 from Get_Data.mareas_data import get_mareas
 from Get_Data.sol_data import get_sun_state
 PORT= os.getenv('PUERTO')
-
+import asyncio
 
 
 app= FastAPI()
@@ -31,19 +30,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-@repeat_every(seconds=60 * 10)  
-async def updateVientoActual():
-    print(time.localtime())
-    get_Data_viento_actual()
+async def llamarWeather():
+    await asyncio.gather(get_weather())
+    print('Llamando a Weateher')        
+    return print('tasks completed...')   
+
+async def llamarViento():
+    asyncio.gather(await get_Data_viento_actual())
+    print('Llamando a Viento Actual')        
+    return print('tasks completed...')     
+def llamarSun():
+    get_sun_state()
+    print('Llamando a Sun State')        
+    return print('tasks completed...')    
+
+async def llamarMareas():
+    await asyncio.gather(get_mareas())
+    print('Llamando a Mareas')        
+    return print('tasks completed...')  
 
 @app.on_event("startup")
-@repeat_every(seconds=60*1)
+@repeat_every(seconds=60*5)
 async def updateViento():
-    print(time.localtime())
-    get_weather()
-    get_sun_state()
-    get_mareas() 
+    await get_Data_viento_actual()
+
+@app.on_event("startup")
+@repeat_every(seconds=60*60)
+async def updateData():
+    await update()
 
 @app.get('/A28P645I455@api')
 async def apiMeteo():
@@ -80,6 +94,13 @@ async def apiMareas():
    
     return apiMareas
 
+
+@app.get('/A28P645I455@api/update')
+async def update():
+    await llamarMareas()
+    llamarSun()
+    await llamarWeather()
+    return json.dumps({'msg': 'Update completed!'})
 
 if __name__=='__main__':
     uvicorn.run('main:app', port= int(PORT), reload= True)
