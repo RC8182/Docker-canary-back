@@ -2,13 +2,12 @@ import uvicorn
 from fastapi import FastAPI
 import json
 import os
-from fastapi_utils.tasks import repeat_every
 from Get_Data.viento_actual_data import get_Data_viento_actual
 from Get_Data.weather_data import get_weather
 from Get_Data.mareas_data import get_mareas
 from Get_Data.sol_data import get_sun_state
 PORT= os.getenv('PUERTO')
-import asyncio
+
 
 
 app= FastAPI()
@@ -30,34 +29,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def llamarWeather():
-    await asyncio.gather(get_weather())
-    print('Llamando a Weateher')        
-    return print('tasks completed...')   
+########## Update BBDD ##############
 
-async def llamarViento():
-    asyncio.gather(await get_Data_viento_actual())
-    print('Llamando a Viento Actual')        
-    return print('tasks completed...')     
-def llamarSun():
-    get_sun_state()
-    print('Llamando a Sun State')        
-    return print('tasks completed...')    
-
-async def llamarMareas():
-    await asyncio.gather(get_mareas())
-    print('Llamando a Mareas')        
-    return print('tasks completed...')  
-
-@app.on_event("startup")
-@repeat_every(seconds=60*5)
+@app.get('/A28P645I455@api/update-viento')
 async def updateViento():
-    await get_Data_viento_actual()
+    print('Actualizando Viento')
+    get_Data_viento_actual()  
+    return{ print('tasks completed...') }  
 
-@app.on_event("startup")
-@repeat_every(seconds=60*60)
-async def updateData():
-    await update()
+@app.get('/A28P645I455@api/update-weather')
+async def updateWeather():
+    print('Actualizanso weather...')
+    try:
+        get_weather()
+        print('Task completed!')
+    except:
+        print('Weather not updated!')
+    return json.dumps({'msg': 'Task completed!'})
+
+@app.get('/A28P645I455@api/update-sun')
+async def updateSun():    
+    print('Actualizando Estado Sol...')    
+    try:
+        get_sun_state()
+        print('Task completed!')
+    except:
+        print('Estado Sol not updated!')
+    return json.dumps({'msg': 'Task completed!'})     
+
+@app.get('/A28P645I455@api/update-mareas')
+async def updateMareas(): 
+    print('Llamando a Mareas')
+    try:
+        get_mareas()
+        print('Task completed!')
+    except:
+        print('mareas not updated')
+    return json.dumps({'msg': 'Task completed!'})
+
+############### Response ==> Viento Weather Sun ############
 
 @app.get('/A28P645I455@api')
 async def apiMeteo():
@@ -84,6 +94,8 @@ async def apiMeteo():
 
     return [apiVientoActual, apiWeather, apiSol]
 
+######### Response ==> Mareas ############
+
 @app.get('/A28P645I455@api/mareas')
 async def apiMareas():
     with open('data/apiMareas.json', 'r') as infile:
@@ -95,12 +107,7 @@ async def apiMareas():
     return apiMareas
 
 
-@app.get('/A28P645I455@api/update')
-async def update():
-    await llamarMareas()
-    llamarSun()
-    await llamarWeather()
-    return json.dumps({'msg': 'Update completed!'})
+
 
 if __name__=='__main__':
     uvicorn.run('main:app', port= int(PORT), reload= True)
