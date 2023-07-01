@@ -5,29 +5,31 @@ services:
     build:
       context: ./api
       dockerfile: ./Dockerfile
-    container_name: canary-api
+    image: img-medano-api  
+    container_name: medano-api
     ports:
       - 8000:8000
     restart: unless-stopped
     volumes:
       - ./schedule/data/:/api/schedule/data/
     networks:
-      - canary-network   
+      - medano-network   
 
   update-api:
     build: 
       context: ./schedule
       dockerfile: ./Dockerfile
-    container_name: canary-update-api
+    image: img-medano-update-api  
+    container_name: medano-update-api
     ports:
       - 8001:8001
     restart: unless-stopped
     volumes:
       - ./schedule/data/:/schedule/data/  
     networks:
-      - canary-network     
+      - medano-network     
 
 networks:
-  canary-network:
+  medano-network:
     driver: bridge
 
