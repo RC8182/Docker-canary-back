@@ -17,7 +17,7 @@ async def updateViento():
     await asyncio.run(get_Data_viento_actual()  ) 
     return{ print('tasks completed...') }  
 
-@app.task('every 60 seconds')
+@app.task('daily')
 async def updateMareas(): 
     print('Llamando a Mareas')
     try:
@@ -27,7 +27,7 @@ async def updateMareas():
         print('mareas not updated')
     return json.dumps({'msg': 'Task completed!'}) 
 
-@app.task('every 120 seconds')
+@app.task('daily')
 async def updateWeather():
     print('Actualizanso weather...')
     try:
@@ -37,7 +37,7 @@ async def updateWeather():
         print('Weather not updated!')
     return json.dumps({'msg': 'Task completed!'})     
 
-@app.task('every 3000 seconds')
+@app.task('daily')
 async def updateSun():    
     print('Actualizando Estado Sol...')    
     try:

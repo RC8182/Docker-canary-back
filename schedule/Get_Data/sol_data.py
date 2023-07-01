@@ -34,7 +34,7 @@ def get_sun_state():
     }   
 
         
-    with open('./sol_data.py', 'w') as file:
+    with open('data/apiSun.json', 'w') as file:
         print('Escribiendo apiSun...')
         try:
             json.dump(api_sun, file)

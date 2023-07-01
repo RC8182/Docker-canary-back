@@ -30,7 +30,9 @@ RUN chmod 777 data
 
 ENV VIENTO_ACTUAL1="https://www.windguru.cz/station/3209"
 ENV VIENTO_ACTUAL2="https://cabezo.bergfex.at/"
-ENV PRONOSTICO_VIENTO="https://muchoviento.net/El%20M%C3%A9dano%20-%20Playa%20Sur/forecast72"
+ENV WEATHER_DATA="https://api.open-meteo.com/v1/forecast?latitude=28.05&longitude=-16.54&hourly=temperature_2m,weathercode,windspeed_10m,windgusts_10m,winddirection_10m,uv_index&models=gfs_global&current_weather=true&windspeed_unit=kn&timezone=Europe%2FLondon"
+ENV MAREAS_DATA="https://ideihm.covam.es/api-ihm/getmarea?request=gettide&id=64&format=json&month=202307"
+
 
 EXPOSE 8001
 

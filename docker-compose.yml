@@ -5,7 +5,7 @@ services:
     build:
       context: ./api
       dockerfile: ./Dockerfile
-    container_name: api
+    container_name: canary-api
     ports:
       - 8000:8000
     restart: unless-stopped
@@ -18,8 +18,7 @@ services:
     build: 
       context: ./schedule
       dockerfile: ./Dockerfile
-    env_file: .env
-    container_name: update-api
+    container_name: canary-update-api
     ports:
       - 8001:8001
     restart: unless-stopped

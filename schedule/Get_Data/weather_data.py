@@ -14,7 +14,7 @@ async def get_weather():
             
             apiWeather= [{'last_update': updated}, await response.json()]
     try:
-        with open('./weather_data.py', 'w') as file:
+        with open('data/apiWeather.json', 'w') as file:
 
             try:
                 json.dump(apiWeather, file)
