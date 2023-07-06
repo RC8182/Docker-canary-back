@@ -14,7 +14,7 @@ from Get_Data.sol_data import get_sun_state
 @app.task('every 180 seconds')
 async def updateViento():
     print('Actualizando Viento')
-    await asyncio.run(get_Data_viento_actual()  ) 
+    asyncio.run(await get_Data_viento_actual()  ) 
     return{ print('tasks completed...') }  
 
 @app.task('daily')

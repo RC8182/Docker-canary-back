@@ -1,18 +1,17 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-import time
 from datetime import datetime
 
-def get_driver(url):    
+async def get_driver(url):    
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--headless") 
     chrome_options.add_argument("--disable-gpu") 
-    time.sleep(1)
+    
     driver =  webdriver.Chrome(service=Service(ChromeDriverManager().install()), chrome_options=chrome_options)
     driver.get(url)
-    time.sleep(5)
+
     return driver
 
 # Creamos una función para iterar sobre la info pedida y almazenarla en una lista
