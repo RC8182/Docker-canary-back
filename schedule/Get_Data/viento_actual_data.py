@@ -39,10 +39,10 @@ async def get_Data_viento_actual():
     apiActualWind= await dataObject(vientoList, directionList, gradosList, [updateList])
     print('dataObject', apiActualWind)
     
-    with open('data/apiActualWind.json', 'w') as file:
+    async with open('data/apiActualWind.json', 'w') as file:
         print('Escribiendo apiActualWind...')
         try:
-            json.dump(apiActualWind, file)
+            json.dump(await apiActualWind, file)
         except:
             print('No hemos podido escribir el archivo')   
              
